@@ -68,3 +68,4 @@ types/                # TypeScript interfaces
 - Cart and wishlist persist in browser localStorage
 "# maro.silver" 
 "# maro.silver" 
+"# maro.silver" 
