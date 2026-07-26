@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number): string {
-  return `${price.toLocaleString("ar-IQ")} د.ع`;
+  return `${price.toLocaleString("ar-IQ")} ج`;
 }
 
 export function slugify(text: string): string {

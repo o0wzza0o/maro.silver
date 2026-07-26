@@ -50,9 +50,9 @@ const sortOptions: { value: SortOption; label: string }[] = [
 
 const priceRanges = [
   { label: "جميع الأسعار", value: "all" },
-  { label: "حتى 40,000 د.ع", value: "40000" },
-  { label: "حتى 60,000 د.ع", value: "60000" },
-  { label: "حتى 100,000 د.ع", value: "100000" },
+  { label: "حتى 40,000 ج", value: "40000" },
+  { label: "حتى 60,000 ج", value: "60000" },
+  { label: "حتى 100,000 ج", value: "100000" },
 ];
 
 function FilterPanel({
