@@ -249,7 +249,7 @@ export default function AdminProductsPage() {
                         images: editProduct.images,
                         category_id: editProduct.categoryId,
                         description: editProduct.description,
-                        specifications: editProduct.specifications,
+                        specifications: editProduct.specifications as unknown as Record<string, string>,
                         sizes: editProduct.sizes,
                         in_stock: editProduct.inStock,
                         stock_count: editProduct.stockCount,
