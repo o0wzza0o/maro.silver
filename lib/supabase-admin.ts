@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = "https://qtdxmetejikhgbxjbpli.supabase.co";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 
 export function getAdminClient() {
   const key =

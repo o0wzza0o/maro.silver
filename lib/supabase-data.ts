@@ -109,7 +109,10 @@ export async function getCategories(): Promise<LocalCategory[]> {
     .select('*')
     .order('name');
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
   return (data || []).map(transformCategory);
 }
 
@@ -141,7 +144,10 @@ export async function getProducts(): Promise<LocalProduct[]> {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
   return (data || []).map(transformProduct);
 }
 
@@ -177,7 +183,10 @@ export async function getProductsByCategory(categorySlug: string): Promise<Local
     .eq('category_id', category.id)
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching products by category:', error);
+    return [];
+  }
   return (data || []).map(transformProduct);
 }
 
@@ -189,7 +198,10 @@ export async function getBestSellers(limit = 6): Promise<LocalProduct[]> {
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching best sellers:', error);
+    return [];
+  }
   return (data || []).map(transformProduct);
 }
 
@@ -201,7 +213,10 @@ export async function getNewArrivals(limit = 8): Promise<LocalProduct[]> {
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching new arrivals:', error);
+    return [];
+  }
   return (data || []).map(transformProduct);
 }
 
@@ -212,7 +227,10 @@ export async function getBanners(): Promise<LocalBanner[]> {
     .order('order_index', { ascending: true })
     .order('created_at', { ascending: false });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching banners:', error);
+    return [];
+  }
   return (data || []).map(transformBanner);
 }
 
@@ -222,7 +240,10 @@ export async function getGovernorates(): Promise<LocalGovernorate[]> {
     .select('*')
     .order('name');
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching governorates:', error);
+    return [];
+  }
   return (data || []).map(transformGovernorate);
 }
 

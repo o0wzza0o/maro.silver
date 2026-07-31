@@ -29,14 +29,18 @@ export function CategoriesSection({ categories }: CategoriesSectionProps) {
                 href={`/products?category=${category.slug}`}
                 className="group flex flex-col items-center gap-3"
               >
-                <div className="relative aspect-square w-full max-w-[120px] overflow-hidden rounded-2xl border border-border bg-secondary transition-all group-hover:shadow-soft-lg group-hover:-translate-y-1">
-                  <Image
-                    src={category.image}
-                    alt={category.name}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    sizes="120px"
-                  />
+                <div className="relative aspect-square w-full max-w-[120px] overflow-hidden rounded-2xl border border-border bg-secondary transition-all group-hover:shadow-soft-lg group-hover:-translate-y-1 flex items-center justify-center">
+                  {category.image ? (
+                    <Image
+                      src={category.image}
+                      alt={category.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="120px"
+                    />
+                  ) : (
+                    <span className="text-xs text-gray-400">لا صورة</span>
+                  )}
                 </div>
                 <span className="text-sm font-medium text-center">
                   {category.name}
