@@ -1,8 +1,11 @@
 import { Shield, CheckCircle2 } from "lucide-react";
 import { SettingsForm } from "@/components/admin/settings-form";
+import { WhatsAppSettings } from "@/components/admin/whatsapp-settings";
+import { getAppSetting } from "@/lib/supabase-data";
 
-export default function AdminSettingsPage() {
+export default async function AdminSettingsPage() {
   const username = process.env.ADMIN_USERNAME || "admin";
+  const whatsappLink = await getAppSetting<string>("whatsapp_link", "");
 
   return (
     <div dir="rtl" className="space-y-6 max-w-2xl">
@@ -17,6 +20,9 @@ export default function AdminSettingsPage() {
           إدارة بيانات الوصول وإعدادات النظام
         </p>
       </div>
+
+      {/* WhatsApp Settings */}
+      <WhatsAppSettings initialLink={whatsappLink} />
 
       {/* Credentials Form */}
       <SettingsForm currentUsername={username} />

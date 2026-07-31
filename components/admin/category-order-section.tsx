@@ -30,10 +30,10 @@ interface Props {
 }
 
 const MAX_HOME = 6;
-const MAX_NAV  = 8;
+const MAX_NAV = 8;
 
 const HOME_KEY = "home_category_order";
-const NAV_KEY  = "nav_category_order";
+const NAV_KEY = "nav_category_order";
 
 async function saveOrder(key: string, ids: string[]) {
   const res = await fetch("/api/admin/db", {
@@ -215,8 +215,8 @@ function OrderContainer({
 export function CategoryOrderSection({ allCategories, initialHomeIds, initialNavIds }: Props) {
   const { toast } = useToast();
   const [homeIds, setHomeIds] = useState<string[]>(initialHomeIds);
-  const [navIds, setNavIds]   = useState<string[]>(initialNavIds);
-  const [saving, setSaving]   = useState(false);
+  const [navIds, setNavIds] = useState<string[]>(initialNavIds);
+  const [saving, setSaving] = useState(false);
 
   async function save() {
     setSaving(true);
@@ -265,7 +265,7 @@ export function CategoryOrderSection({ allCategories, initialHomeIds, initialNav
           onChange={setHomeIds}
         />
         <OrderContainer
-          title="شريط التصنيفات (Navbar)"
+          title="شريط التنقل"
           subtitle="تظهر في القائمة العلوية"
           max={MAX_NAV}
           selectedIds={navIds}
