@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const ADMIN_SESSION_COOKIE = "admin_session";
-const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "maro-silver-secret-session-key-2025";
+const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

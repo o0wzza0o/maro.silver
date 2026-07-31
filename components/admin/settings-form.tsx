@@ -20,7 +20,7 @@ export function SettingsForm({ currentUsername }: { currentUsername: string }) {
       if (res.success) {
         toast({
           title: "تم الحفظ بنجاح",
-          description: "تم تحديث بيانات الدخول. قد تحتاج لإعادة تشغيل الخادم لتطبيق التغييرات.",
+          description: "تم تحديث بيانات الدخول بنجاح وتفعيلها فوراً.",
         });
         setPassword(""); // Clear password field after save
       } else {
@@ -87,11 +87,6 @@ export function SettingsForm({ currentUsername }: { currentUsername: string }) {
           )}
           حفظ التعديلات
         </button>
-      </div>
-
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex gap-2 mt-4">
-        <span className="shrink-0">⚠️</span>
-        <span>تنبيه: ستحتاج للتواصل مع شركة Mix Host لإعادة تشغيل الخادم وتفعيل بيانات الدخول الجديدة.</span>
       </div>
     </form>
   );

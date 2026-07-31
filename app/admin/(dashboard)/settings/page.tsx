@@ -4,7 +4,7 @@ import { WhatsAppSettings } from "@/components/admin/whatsapp-settings";
 import { getAppSetting } from "@/lib/supabase-data";
 
 export default async function AdminSettingsPage() {
-  const username = process.env.ADMIN_USERNAME || "admin";
+  const username = await getAppSetting<string>("admin_username", process.env.ADMIN_USERNAME || "");
   const whatsappLink = await getAppSetting<string>("whatsapp_link", "");
 
   return (
@@ -27,7 +27,7 @@ export default async function AdminSettingsPage() {
       {/* Credentials Form */}
       <SettingsForm currentUsername={username} />
 
-     
+
       {/* Security Notes */}
       <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 space-y-3">
         <h3 className="font-semibold text-gray-900">ملاحظات الأمان</h3>

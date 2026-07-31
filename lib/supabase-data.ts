@@ -270,3 +270,22 @@ export async function getAppSetting<T = unknown>(key: string, fallback: T): Prom
   if (error || !data) return fallback;
   return data.value as T;
 }
+
+export async function setAppSetting<T = unknown>(key: string, value: T): Promise<boolean> {
+  // Try to update existing
+  const { error: updateError } = await supabase
+    .from('app_settings')
+    .update({ value })
+    .eq('key', key);
+
+  if (!updateError) {
+    return true;
+  }
+
+  // If update fails, try insert (upsert)
+  const { error: insertError } = await supabase
+    .from('app_settings')
+    .upsert({ key, value }, { onConflict: 'key' });
+
+  return !insertError;
+}
