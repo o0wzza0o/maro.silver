@@ -3,8 +3,10 @@ import { SettingsForm } from "@/components/admin/settings-form";
 import { WhatsAppSettings } from "@/components/admin/whatsapp-settings";
 import { getAppSetting } from "@/lib/supabase-data";
 
+import { env } from "@/lib/env";
+
 export default async function AdminSettingsPage() {
-  const username = await getAppSetting<string>("admin_username", process.env.ADMIN_USERNAME || "");
+  const username = env.ADMIN_USERNAME;
   const whatsappLink = await getAppSetting<string>("whatsapp_link", "");
 
   return (

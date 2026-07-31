@@ -19,13 +19,14 @@ import {
   saveAppSetting,
 } from "@/lib/supabase-admin";
 
-const SESSION_SECRET =
-  process.env.ADMIN_SESSION_SECRET || "maro-silver-secret-session-key-2025";
+import { validateSession } from "@/lib/session";
 
 async function verifySession(): Promise<boolean> {
   const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
-  return session?.value === SESSION_SECRET;
+  const sessionCookie = cookieStore.get("admin_session");
+  if (!sessionCookie || !sessionCookie.value) return false;
+  const session = await validateSession(sessionCookie.value);
+  return !!session;
 }
 
 export async function POST(request: Request) {
@@ -97,7 +98,7 @@ export async function POST(request: Request) {
 
     // Revalidate the entire application layout so all pages fetch fresh data
     revalidatePath("/", "layout");
-    
+
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("[admin/db]", err);
