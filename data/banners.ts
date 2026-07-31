@@ -9,3 +9,7 @@ export async function getBanners(): Promise<Banner[]> {
   bannersCache = await fetchBanners();
   return bannersCache;
 }
+
+export function clearBannersCache() {
+  bannersCache = null;
+}

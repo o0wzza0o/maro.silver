@@ -10,6 +10,10 @@ export async function getCategories(): Promise<Category[]> {
   return categoriesCache;
 }
 
+export function clearCategoriesCache() {
+  categoriesCache = null;
+}
+
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
   return await fetchCategoryBySlug(slug) || undefined;
 }

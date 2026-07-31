@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatPrice } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import { adminUpdateOrderStatus } from "@/lib/admin-api";
 import {
   ChevronDown,
@@ -37,6 +38,7 @@ const STATUSES = {
 };
 
 export function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
+  const { toast } = useToast();
   const [orders, setOrders] = useState(initialOrders);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -45,9 +47,17 @@ export function OrdersClient({ initialOrders }: { initialOrders: any[] }) {
     try {
       await adminUpdateOrderStatus(id, newStatus);
       setOrders(orders.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ الإعدادات",
+      });
     } catch (error) {
       console.error(error);
-      alert("فشل في تحديث حالة الطلب");
+      toast({
+        title: "خطأ",
+        description: "فشل في تحديث حالة الطلب",
+        variant: "destructive",
+      });
     }
   };
 

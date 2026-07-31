@@ -18,12 +18,23 @@ import type { Category } from "@/types";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [navCats, setNavCats] = useState<Category[]>([]);
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
 
   useEffect(() => {
-    getCategories().then(setCategories);
+    async function load() {
+      const [all, res] = await Promise.all([
+        getCategories(),
+        fetch("/api/admin/settings?key=nav_category_order").then(r => r.json()).catch(() => ({ value: [] })),
+      ]);
+      const ids: string[] = Array.isArray(res?.value) ? res.value : [];
+      setNavCats(ids.length > 0
+        ? ids.map(id => all.find(c => c.id === id)).filter(Boolean) as Category[]
+        : all
+      );
+    }
+    load();
   }, []);
 
   return (
@@ -37,7 +48,7 @@ export function Navbar() {
 
           {/* Desktop Categories */}
           <nav className="hidden lg:flex items-center gap-1" aria-label="التصنيفات">
-            {categories.slice(0, 6).map((category) => (
+            {navCats.map((category) => (
               <Link
                 key={category.id}
                 href={`/products?category=${category.slug}`}
@@ -117,7 +128,7 @@ export function Navbar() {
           )}
         >
           <nav className="flex flex-col gap-1 pt-2">
-            {categories.map((category) => (
+            {navCats.map((category) => (
               <Link
                 key={category.id}
                 href={`/products?category=${category.slug}`}

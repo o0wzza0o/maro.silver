@@ -16,6 +16,7 @@ import {
   deleteGovernorate,
   updateBannersOrder,
   updateOrderStatus,
+  saveAppSetting,
 } from "@/lib/supabase-admin";
 
 const SESSION_SECRET =
@@ -86,6 +87,11 @@ export async function POST(request: Request) {
         break;
 
       default:
+        // ── app_settings (key/value store) ────────────────────
+        if (table === "app_settings" && action === "update" && id && data !== undefined) {
+          await saveAppSetting(id, data);
+          break;
+        }
         return NextResponse.json({ error: "Invalid table" }, { status: 400 });
     }
 

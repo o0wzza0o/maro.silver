@@ -10,6 +10,10 @@ export async function getGovernorates(): Promise<Governorate[]> {
   return governoratesCache;
 }
 
+export function clearGovernoratesCache() {
+  governoratesCache = null;
+}
+
 export async function getGovernorateById(id: string): Promise<Governorate | undefined> {
   return await fetchGovernorateById(id) || undefined;
 }

@@ -10,6 +10,10 @@ export async function getProducts(): Promise<Product[]> {
   return productsCache;
 }
 
+export function clearProductsCache() {
+  productsCache = null;
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   return await fetchProductBySlug(slug) || undefined;
 }

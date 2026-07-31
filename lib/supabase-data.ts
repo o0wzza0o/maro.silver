@@ -257,3 +257,16 @@ export async function getGovernorateById(id: string): Promise<LocalGovernorate |
   if (error) return null;
   return transformGovernorate(data);
 }
+
+// ─── App Settings ─────────────────────────────────────────────────────────────
+
+export async function getAppSetting<T = unknown>(key: string, fallback: T): Promise<T> {
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) return fallback;
+  return data.value as T;
+}

@@ -3,8 +3,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, X, Loader2, ExternalLink, GripVertical } from "lucide-react";
-import { getBanners } from "@/data/banners";
+import { getBanners, clearBannersCache } from "@/data/banners";
 import { adminCreateBanner, adminUpdateBanner, adminDeleteBanner, adminReorderBanners } from "@/lib/admin-api";
+import { useToast } from "@/hooks/use-toast";
 import type { Banner } from "@/types";
 import {
   DndContext,
@@ -25,6 +26,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 export default function AdminBannersPage() {
+  const { toast } = useToast();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -63,9 +65,14 @@ export default function AdminBannersPage() {
       const newBanners = arrayMove(items, oldIndex, newIndex);
       
       // Save new order to backend asynchronously
-      adminReorderBanners(newBanners.map(b => b.id)).catch(() => {
-        setError("فشل في حفظ الترتيب الجديد");
-      });
+      adminReorderBanners(newBanners.map(b => b.id))
+        .then(() => {
+          clearBannersCache();
+          toast({ title: "تم الحفظ بنجاح", description: "تم حفظ الترتيب الجديد" });
+        })
+        .catch(() => {
+          setError("فشل في حفظ الترتيب الجديد");
+        });
 
       return newBanners;
     });
@@ -98,7 +105,12 @@ export default function AdminBannersPage() {
         await adminCreateBanner(payload);
       }
       setShowForm(false);
+      clearBannersCache();
       await fetchData();
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ الإعدادات",
+      });
     } catch (e: any) {
       setError(e?.message || "حدث خطأ");
     } finally {
@@ -109,7 +121,12 @@ export default function AdminBannersPage() {
   async function handleDelete(id: string) {
     setDeleting(true);
     await adminDeleteBanner(id).catch(() => null);
+    clearBannersCache();
     await fetchData();
+    toast({
+      title: "تم الحذف بنجاح",
+      description: "تم مسح البانر",
+    });
     setDeleteId(null);
     setDeleting(false);
   }

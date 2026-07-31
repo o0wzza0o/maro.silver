@@ -3,13 +3,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Search, Pencil, Trash2, X, Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { getProducts } from "@/data/products";
+import { getProducts, clearProductsCache } from "@/data/products";
 import { getCategories } from "@/data/categories";
 import { adminDeleteProduct } from "@/lib/admin-api";
+import { useToast } from "@/hooks/use-toast";
 import { ProductForm } from "@/components/admin/products/product-form";
 import type { Product, Category } from "@/types";
 
 export default function AdminProductsPage() {
+  const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,7 +50,12 @@ export default function AdminProductsPage() {
   async function handleDelete(id: string) {
     setDeleting(true);
     await adminDeleteProduct(id).catch(() => null);
+    clearProductsCache();
     await fetchData();
+    toast({
+      title: "تم الحذف بنجاح",
+      description: "تم مسح المنتج",
+    });
     setDeleteId(null);
     setDeleting(false);
   }
@@ -56,8 +63,7 @@ export default function AdminProductsPage() {
   function handleSuccess() {
     setShowForm(false);
     setEditProduct(null);
-    // Bust cache
-    (window as any).__productsCache = null;
+    clearProductsCache();
     fetchData();
   }
 

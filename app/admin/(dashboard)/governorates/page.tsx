@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
-import { getGovernorates } from "@/data/governorates";
+import { getGovernorates, clearGovernoratesCache } from "@/data/governorates";
 import { adminCreateGovernorate, adminUpdateGovernorate, adminDeleteGovernorate } from "@/lib/admin-api";
+import { useToast } from "@/hooks/use-toast";
 import type { Governorate } from "@/types";
 
 export default function AdminGovernoratesPage() {
+  const { toast } = useToast();
   const [governorates, setGovernorates] = useState<Governorate[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -45,7 +47,13 @@ export default function AdminGovernoratesPage() {
       } else {
         await adminCreateGovernorate({ name: name.trim(), cities });
       }
-      setShowForm(false); await fetchData();
+      setShowForm(false); 
+      clearGovernoratesCache();
+      await fetchData();
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ الإعدادات",
+      });
     } catch (e: any) {
       setError(e?.message || "حدث خطأ");
     } finally {
@@ -56,7 +64,12 @@ export default function AdminGovernoratesPage() {
   async function handleDelete(id: string) {
     setDeleting(true);
     await adminDeleteGovernorate(id).catch(() => null);
+    clearGovernoratesCache();
     await fetchData(); setDeleteId(null); setDeleting(false);
+    toast({
+      title: "تم الحذف بنجاح",
+      description: "تم مسح المحافظة",
+    });
   }
 
   return (

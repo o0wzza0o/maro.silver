@@ -3,14 +3,21 @@ import { CategoriesSection } from "@/components/home/categories-section";
 import { ProductSection } from "@/components/home/product-section";
 import { getCategories } from "@/data/categories";
 import { getBestSellers, getNewArrivals } from "@/data/products";
+import { getAppSetting } from "@/lib/supabase-data";
 import { PageTransition } from "@/components/layout/animations";
 
 export default async function HomePage() {
-  const [categories, bestSellers, newArrivals] = await Promise.all([
+  const [categories, bestSellers, newArrivals, homeOrderIds] = await Promise.all([
     getCategories(),
     getBestSellers(),
     getNewArrivals(),
+    getAppSetting<string[]>("home_category_order", []),
   ]);
+
+  // Apply admin-configured order; fall back to first 6
+  const orderedHomeCategories = homeOrderIds.length > 0
+    ? homeOrderIds.map(id => categories.find(c => c.id === id)).filter(Boolean) as typeof categories
+    : categories.slice(0, 6);
 
   return (
     <PageTransition>
@@ -18,7 +25,7 @@ export default async function HomePage() {
         <HeroSlider />
       </div>
 
-      <CategoriesSection categories={categories} />
+      <CategoriesSection categories={orderedHomeCategories} />
 
       <ProductSection
         title="الأكثر مبيعاً"

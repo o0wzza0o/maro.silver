@@ -3,14 +3,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
-import { getCategories } from "@/data/categories";
+import { getCategories, clearCategoriesCache } from "@/data/categories";
 import { adminCreateCategory, adminUpdateCategory, adminDeleteCategory } from "@/lib/admin-api";
 import { slugify } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { CategoryOrderSection } from "@/components/admin/category-order-section";
 import type { Category } from "@/types";
 
 export default function AdminCategoriesPage() {
+  const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [homeOrderIds, setHomeOrderIds] = useState<string[]>([]);
+  const [navOrderIds, setNavOrderIds]   = useState<string[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState<Category | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -25,7 +30,14 @@ export default function AdminCategoriesPage() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    setCategories(await getCategories().catch(() => []));
+    const [cats, homeRes, navRes] = await Promise.all([
+      getCategories().catch(() => [] as Category[]),
+      fetch("/api/admin/settings?key=home_category_order").then(r => r.json()).catch(() => ({ value: [] })),
+      fetch("/api/admin/settings?key=nav_category_order").then(r => r.json()).catch(() => ({ value: [] })),
+    ]);
+    setCategories(cats);
+    setHomeOrderIds(Array.isArray(homeRes?.value) ? homeRes.value : []);
+    setNavOrderIds(Array.isArray(navRes?.value) ? navRes.value : []);
     setLoading(false);
   }, []);
 
@@ -54,7 +66,12 @@ export default function AdminCategoriesPage() {
         await adminCreateCategory({ name: name.trim(), slug: finalSlug, image: image.trim() });
       }
       setShowForm(false);
+      clearCategoriesCache();
       await fetchData();
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ الإعدادات",
+      });
     } catch (e: any) {
       setError(e?.message || "حدث خطأ");
     } finally {
@@ -65,7 +82,12 @@ export default function AdminCategoriesPage() {
   async function handleDelete(id: string) {
     setDeleting(true);
     await adminDeleteCategory(id).catch(() => null);
+    clearCategoriesCache();
     await fetchData();
+    toast({
+      title: "تم الحذف بنجاح",
+      description: "تم مسح التصنيف",
+    });
     setDeleteId(null);
     setDeleting(false);
   }
@@ -117,6 +139,15 @@ export default function AdminCategoriesPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Category Display Order */}
+      {!loading && (
+        <CategoryOrderSection
+          allCategories={categories}
+          initialHomeIds={homeOrderIds}
+          initialNavIds={navOrderIds}
+        />
       )}
 
       {/* Form Modal */}

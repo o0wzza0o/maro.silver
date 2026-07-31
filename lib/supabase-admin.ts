@@ -172,3 +172,12 @@ export async function updateOrderStatus(id: string, status: string) {
     .eq("id", id);
   if (error) throw error;
 }
+
+// ─── App Settings ─────────────────────────────────────────────────────────────
+
+export async function saveAppSetting(key: string, value: unknown) {
+  const { error } = await getAdminClient()
+    .from('app_settings')
+    .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  if (error) throw error;
+}

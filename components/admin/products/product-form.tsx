@@ -7,6 +7,7 @@ import { z } from "zod";
 import { X, Plus, Loader2 } from "lucide-react";
 import { adminCreateProduct, adminUpdateProduct } from "@/lib/admin-api";
 import { slugify } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 import type { Category } from "@/types";
 
 const schema = z.object({
@@ -57,6 +58,7 @@ export function ProductForm({
   onSuccess,
   onCancel,
 }: ProductFormProps) {
+  const { toast } = useToast();
   const isEdit = !!initialData?.id;
   const [images, setImages] = useState<string[]>(initialData?.images || [""]);
   const [sizes, setSizes] = useState<string[]>(initialData?.sizes || []);
@@ -159,6 +161,10 @@ export function ProductForm({
       } else {
         await adminCreateProduct(payload as Record<string, unknown>);
       }
+      toast({
+        title: "تم الحفظ بنجاح",
+        description: "تم حفظ الإعدادات",
+      });
       onSuccess();
     } catch (err: any) {
       setError(err?.message || "حدث خطأ أثناء الحفظ");
