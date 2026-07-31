@@ -38,8 +38,6 @@ export default async function AdminSettingsPage() {
             "استخدم كلمة مرور قوية تحتوي على أرقام وحروف ورموز",
             "لا تشارك بيانات الدخول مع أي شخص غير موثوق",
             "صلاحية الجلسة تنتهي بعد 7 أيام من تسجيل الدخول",
-            "يتم تشفير كوكي الجلسة وهو HTTP-only للحماية من XSS",
-            "لا تنشر ملف .env على GitHub أو أي مستودع عام",
           ].map((note) => (
             <li key={note} className="flex gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
