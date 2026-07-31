@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { BottomNav } from "@/components/layout/bottom-nav";
+
 import { Providers } from "@/components/layout/providers";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -26,15 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
-      <body className={`${cairo.variable} font-sans antialiased`}>
+    <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <body className={`${cairo.variable} font-sans antialiased`} suppressHydrationWarning>
         <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1 pb-20 md:pb-0">{children}</main>
-            <Footer />
-            <BottomNav />
-          </div>
+          {children}
           <Toaster />
         </Providers>
       </body>

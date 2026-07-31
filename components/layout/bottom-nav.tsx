@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, LayoutGrid, Heart, ShoppingBag, MoreHorizontal } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { cn } from "@/lib/utils";
@@ -14,7 +15,8 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { categories } from "@/data/categories";
+import { getCategories } from "@/data/categories";
+import type { Category } from "@/types";
 
 const navItems = [
   { href: "/", label: "الرئيسية", icon: Home },
@@ -25,8 +27,13 @@ const navItems = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  const [categories, setCategories] = useState<Category[]>([]);
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";

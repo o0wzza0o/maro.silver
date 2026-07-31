@@ -7,7 +7,7 @@ import { PageTransition, SlideUp } from "@/components/layout/animations";
 import { useCart } from "@/hooks/useCart";
 import { ShoppingBag } from "lucide-react";
 
-export default function CartPage() {
+function CartContent() {
   const { items, isHydrated } = useCart();
 
   if (!isHydrated) {
@@ -42,4 +42,8 @@ export default function CartPage() {
       </div>
     </PageTransition>
   );
+}
+
+export default function CartPage() {
+  return <CartContent />;
 }

@@ -7,7 +7,7 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { PageTransition, SlideUp } from "@/components/layout/animations";
 import { useCart } from "@/hooks/useCart";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const { items, isHydrated } = useCart();
   const router = useRouter();
 
@@ -44,4 +44,8 @@ export default function CheckoutPage() {
       </div>
     </PageTransition>
   );
+}
+
+export default function CheckoutPage() {
+  return <CheckoutContent />;
 }

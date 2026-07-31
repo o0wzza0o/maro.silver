@@ -1,13 +1,16 @@
 import { HeroSlider } from "@/components/home/hero-slider";
 import { CategoriesSection } from "@/components/home/categories-section";
 import { ProductSection } from "@/components/home/product-section";
-import { categories } from "@/data/categories";
+import { getCategories } from "@/data/categories";
 import { getBestSellers, getNewArrivals } from "@/data/products";
 import { PageTransition } from "@/components/layout/animations";
 
-export default function HomePage() {
-  const bestSellers = getBestSellers();
-  const newArrivals = getNewArrivals();
+export default async function HomePage() {
+  const [categories, bestSellers, newArrivals] = await Promise.all([
+    getCategories(),
+    getBestSellers(),
+    getNewArrivals(),
+  ]);
 
   return (
     <PageTransition>

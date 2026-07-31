@@ -27,9 +27,8 @@ interface ProductDetailsProps {
 export function ProductDetailsView({ product }: ProductDetailsProps) {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string | undefined>(
-    product.sizes?.[0]
-  );
+  const [selectedSize, setSelectedSize] = useState<string | undefined>();
+  const [sizeError, setSizeError] = useState(false);
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
   const { toast } = useToast();
@@ -37,6 +36,17 @@ export function ProductDetailsView({ product }: ProductDetailsProps) {
 
   const handleAddToCart = () => {
     if (!product.inStock) return;
+    
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      setSizeError(true);
+      toast({
+        title: "برجاء اختيار المقاس أولاً",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setSizeError(false);
     addItem(product, quantity, selectedSize);
     toast({
       title: "تمت الإضافة للسلة",
@@ -179,9 +189,18 @@ export function ProductDetailsView({ product }: ProductDetailsProps) {
         {/* Size Selector */}
         {product.sizes && product.sizes.length > 0 && (
           <div>
-            <label className="text-sm font-medium mb-2 block">المقاس</label>
-            <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="w-full max-w-xs">
+            <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+              المقاس 
+              {sizeError && <span className="text-xs text-red-500 font-normal">(مطلوب)</span>}
+            </label>
+            <Select 
+              value={selectedSize} 
+              onValueChange={(val) => {
+                setSelectedSize(val);
+                setSizeError(false);
+              }}
+            >
+              <SelectTrigger className={cn("w-full max-w-xs", sizeError && "border-red-500 ring-1 ring-red-500")}>
                 <SelectValue placeholder="اختر المقاس" />
               </SelectTrigger>
               <SelectContent>

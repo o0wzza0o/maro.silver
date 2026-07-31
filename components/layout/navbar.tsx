@@ -5,21 +5,26 @@ import {
   Search,
   Heart,
   ShoppingBag,
-  User,
   Menu,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { categories } from "@/data/categories";
+import { getCategories } from "@/data/categories";
 import { useCart } from "@/hooks/useCart";
 import { useWishlist } from "@/hooks/useWishlist";
 import { cn } from "@/lib/utils";
+import type { Category } from "@/types";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
+
+  useEffect(() => {
+    getCategories().then(setCategories);
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
@@ -69,9 +74,6 @@ export function Navbar() {
                   </span>
                 )}
               </Link>
-            </Button>
-            <Button variant="ghost" size="icon" aria-label="الملف الشخصي">
-              <User className="h-5 w-5" />
             </Button>
           </div>
 

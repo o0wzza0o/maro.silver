@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search, Clock, X } from "lucide-react";
-import { products, recentSearches, suggestedSearchProducts } from "@/data/products";
+import { getProducts, recentSearches, suggestedSearchProducts } from "@/data/products";
 import { filterProducts } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { ProductCard } from "@/components/cards/product-card";
@@ -12,18 +12,33 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { PageTransition, SlideUp } from "@/components/layout/animations";
 import { formatPrice } from "@/lib/utils";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import type { Product } from "@/types";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [suggestedProducts, setSuggestedProducts] = useState<Product[]>([]);
   const [storedSearches, setStoredSearches] = useLocalStorage<string[]>(
     "maro-silver-recent-searches",
     recentSearches
   );
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const [productsData, suggestedData] = await Promise.all([
+        getProducts(),
+        suggestedSearchProducts(),
+      ]);
+      setProducts(productsData);
+      setSuggestedProducts(suggestedData);
+    };
+    fetchData();
+  }, []);
+
   const searchResults = useMemo(() => {
     if (!query.trim()) return [];
     return filterProducts(products, { search: query.trim() });
-  }, [query]);
+  }, [query, products]);
 
   const handleSearch = (searchQuery: string) => {
     setQuery(searchQuery);
@@ -115,7 +130,7 @@ export default function SearchPage() {
             <section>
               <h2 className="font-semibold mb-4">منتجات مقترحة</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {suggestedSearchProducts.map((product) => (
+                {suggestedProducts.map((product) => (
                   <Link
                     key={product.id}
                     href={`/products/${product.slug}`}

@@ -11,12 +11,22 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { banners } from "@/data/banners";
+import { getBanners } from "@/data/banners";
 import { cn } from "@/lib/utils";
+import type { Banner } from "@/types";
 
 export function HeroSlider() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getBanners()
+      .then(setBanners)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     if (!api) return;
@@ -33,6 +43,20 @@ export function HeroSlider() {
     [api]
   );
 
+  if (loading) {
+    return (
+      <section className="relative aspect-[16/9] md:aspect-[21/7] overflow-hidden rounded-2xl bg-muted animate-pulse" aria-label="البانر الرئيسي">
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-muted-foreground">جاري التحميل...</div>
+        </div>
+      </section>
+    );
+  }
+
+  if (banners.length === 0) {
+    return null;
+  }
+
   return (
     <section className="relative" aria-label="البانر الرئيسي">
       <Carousel
@@ -42,7 +66,7 @@ export function HeroSlider() {
         className="w-full"
       >
         <CarouselContent>
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <CarouselItem key={banner.id}>
               <div className="relative aspect-[16/9] md:aspect-[21/7] overflow-hidden rounded-2xl">
                 <Image
@@ -50,7 +74,7 @@ export function HeroSlider() {
                   alt={banner.title}
                   fill
                   className="object-cover"
-                  priority={banner.id === "1"}
+                  priority={index === 0}
                   sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />

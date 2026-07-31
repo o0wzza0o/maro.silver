@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getProductBySlug, products } from "@/data/products";
+import { getProductBySlug, getProducts } from "@/data/products";
 import { getRelatedProducts } from "@/lib/products";
 import { ProductDetailsView } from "@/components/products/product-details";
 import { ProductSection } from "@/components/home/product-section";
@@ -11,6 +11,7 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
+  const products = await getProducts();
   return products.map((product) => ({
     slug: product.slug,
   }));
@@ -18,7 +19,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "منتج غير موجود" };
   return {
     title: `${product.name} | MARO SILVER`,
@@ -28,13 +29,16 @@ export async function generateMetadata({ params }: ProductPageProps) {
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const [product, allProducts] = await Promise.all([
+    getProductBySlug(slug),
+    getProducts(),
+  ]);
 
   if (!product) {
     notFound();
   }
 
-  const relatedProducts = getRelatedProducts(products, product);
+  const relatedProducts = getRelatedProducts(allProducts, product);
 
   return (
     <PageTransition>

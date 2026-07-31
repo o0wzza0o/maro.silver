@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SlidersHorizontal, LayoutGrid, List } from "lucide-react";
 import { Product, SortOption, ViewMode } from "@/types";
 import { ProductCard } from "@/components/cards/product-card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Pagination } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -15,12 +16,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export interface ProductFilters {
@@ -48,22 +49,25 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "price-desc", label: "السعر: من الأعلى" },
 ];
 
-const priceRanges = [
-  { label: "جميع الأسعار", value: "all" },
-  { label: "حتى 40,000 ج", value: "40000" },
-  { label: "حتى 60,000 ج", value: "60000" },
-  { label: "حتى 100,000 ج", value: "100000" },
-];
+
 
 function FilterPanel({
-  filters,
-  onFiltersChange,
+  initialFilters,
+  onApply,
+  onClose,
 }: {
-  filters: ProductFilters;
-  onFiltersChange: (filters: ProductFilters) => void;
+  initialFilters: ProductFilters;
+  onApply: (filters: ProductFilters) => void;
+  onClose: () => void;
 }) {
+  const [filters, setFilters] = useState<ProductFilters>(initialFilters);
+
+  useEffect(() => {
+    setFilters(initialFilters);
+  }, [initialFilters]);
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-6">
       <div className="space-y-3">
         <Label className="text-sm font-medium">التوفر</Label>
         <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-secondary">
@@ -71,7 +75,7 @@ function FilterPanel({
             type="checkbox"
             checked={filters.inStockOnly}
             onChange={(e) =>
-              onFiltersChange({ ...filters, inStockOnly: e.target.checked })
+              setFilters({ ...filters, inStockOnly: e.target.checked })
             }
             className="h-4 w-4 rounded border-border"
           />
@@ -80,27 +84,41 @@ function FilterPanel({
       </div>
 
       <div className="space-y-3">
-        <Label className="text-sm font-medium">السعر الأقصى</Label>
-        <Select
-          value={filters.maxPrice?.toString() ?? "all"}
-          onValueChange={(value) =>
-            onFiltersChange({
+        <Label className="text-sm font-medium">السعر الأقصى (جنيه)</Label>
+        <Input
+          type="number"
+          placeholder="أدخل الحد الأقصى للسعر..."
+          value={filters.maxPrice || ""}
+          onChange={(e) => {
+            const val = e.target.value;
+            setFilters({
               ...filters,
-              maxPrice: value === "all" ? undefined : Number(value),
-            })
-          }
+              maxPrice: val === "" ? undefined : Number(val),
+            });
+          }}
+          min={0}
+        />
+      </div>
+
+      <div className="pt-6 border-t border-gray-100 flex gap-3">
+        <Button 
+          className="flex-1" 
+          onClick={() => {
+            onApply(filters);
+            onClose();
+          }}
         >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {priceRanges.map((range) => (
-              <SelectItem key={range.value} value={range.value}>
-                {range.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          تطبيق الفلاتر
+        </Button>
+        <Button 
+          variant="outline"
+          className="flex-1"
+          onClick={() => {
+            setFilters({ inStockOnly: false, maxPrice: undefined });
+          }}
+        >
+          إعادة ضبط
+        </Button>
       </div>
     </div>
   );
@@ -126,27 +144,29 @@ export function ProductGrid({
   return (
     <div>
       <div className="flex items-center justify-between gap-4 mb-6">
-        <Drawer open={filterOpen} onOpenChange={setFilterOpen}>
-          <DrawerTrigger asChild>
+        <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+          <SheetTrigger asChild>
             <Button variant="outline" size="sm" className="relative">
               <SlidersHorizontal className="h-4 w-4" />
-              فلتر
+              تصفية
               {activeFilterCount > 0 && (
                 <span className="absolute -top-1.5 -left-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
                   {activeFilterCount}
                 </span>
               )}
             </Button>
-          </DrawerTrigger>
-          <DrawerContent>
-            <DrawerHeader>
-              <DrawerTitle>الفلاتر</DrawerTitle>
-            </DrawerHeader>
-            <div className="p-4 pb-8">
-              <FilterPanel filters={filters} onFiltersChange={onFiltersChange} />
-            </div>
-          </DrawerContent>
-        </Drawer>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-full sm:w-[400px] font-cairo overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle className="text-right font-bold text-xl">تصفية المنتجات</SheetTitle>
+            </SheetHeader>
+            <FilterPanel 
+              initialFilters={filters} 
+              onApply={onFiltersChange}
+              onClose={() => setFilterOpen(false)}
+            />
+          </SheetContent>
+        </Sheet>
 
         <div className="flex items-center gap-2">
           <Select value={sort} onValueChange={(v) => onSortChange(v as SortOption)}>

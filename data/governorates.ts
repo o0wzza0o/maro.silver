@@ -1,44 +1,15 @@
 import { Governorate } from "@/types";
+import { getGovernorates as fetchGovernorates, getGovernorateById as fetchGovernorateById } from "@/lib/supabase-data";
 
-export const governorates: Governorate[] = [
-  {
-    id: "baghdad",
-    name: "بغداد",
-    cities: ["الكرخ", "الرصافة", "المنصور", "الكاظمية", "مدينة الصدر"],
-  },
-  {
-    id: "basra",
-    name: "البصرة",
-    cities: ["العشار", "الزبير", "أبو الخصيب", "القرنة"],
-  },
-  {
-    id: "nineveh",
-    name: "نينوى",
-    cities: ["الموصل", "تلعفر", "الحمدانية", "سنجار"],
-  },
-  {
-    id: "erbil",
-    name: "أربيل",
-    cities: ["أربيل", "شقلاوة", "كويسنجق", "مخمور"],
-  },
-  {
-    id: "sulaymaniyah",
-    name: "السليمانية",
-    cities: ["السليمانية", "حلبجة", "رania", "دوkan"],
-  },
-  {
-    id: "karbala",
-    name: "كربلاء",
-    cities: ["كربلاء", "عين التمر", "ال Hindiya"],
-  },
-  {
-    id: "najaf",
-    name: "النجف",
-    cities: ["النجف", "الكوفة", "المناذرة"],
-  },
-  {
-    id: "diyala",
-    name: "ديالى",
-    cities: ["بعقوبة", "الخالisiya", "المقدادية", "خanaqin"],
-  },
-];
+// Cache for client-side
+let governoratesCache: Governorate[] | null = null;
+
+export async function getGovernorates(): Promise<Governorate[]> {
+  if (governoratesCache) return governoratesCache;
+  governoratesCache = await fetchGovernorates();
+  return governoratesCache;
+}
+
+export async function getGovernorateById(id: string): Promise<Governorate | undefined> {
+  return await fetchGovernorateById(id) || undefined;
+}

@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { products } from "@/data/products";
-import { categories, getCategoryBySlug } from "@/data/categories";
+import { getProducts } from "@/data/products";
+import { getCategories, getCategoryBySlug } from "@/data/categories";
 import { filterProducts, sortProducts, paginateProducts } from "@/lib/products";
 import { ProductGrid } from "@/components/products/product-grid";
 import type { ProductFilters } from "@/components/products/product-grid";
@@ -12,6 +12,7 @@ import { Breadcrumb } from "@/components/layout/breadcrumb";
 import { ProductGridSkeleton } from "@/components/layout/skeletons";
 import { PageTransition, SlideUp } from "@/components/layout/animations";
 import { SortOption, ViewMode } from "@/types";
+import type { Product, Category } from "@/types";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -29,8 +30,32 @@ function ProductsContent() {
   const [filters, setFilters] = useState<ProductFilters>({
     inStockOnly: false,
   });
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category | undefined>(undefined);
+  const [loading, setLoading] = useState(true);
 
-  const category = categorySlug ? getCategoryBySlug(categorySlug) : undefined;
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const [productsData, categoriesData] = await Promise.all([
+        getProducts(),
+        getCategories(),
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+      
+      if (categorySlug) {
+        const cat = await getCategoryBySlug(categorySlug);
+        setCategory(cat || undefined);
+      } else {
+        setCategory(undefined);
+        setActiveSubCategory(undefined);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [categorySlug]);
 
   const filteredProducts = useMemo(() => {
     let result = filterProducts(products, {
@@ -41,7 +66,7 @@ function ProductsContent() {
     });
     result = sortProducts(result, sort);
     return result;
-  }, [category?.id, activeSubCategory, sort, filters]);
+  }, [category?.id, activeSubCategory, sort, filters, products]);
 
   const { items: paginatedProducts, totalPages } = useMemo(
     () => paginateProducts(filteredProducts, currentPage, ITEMS_PER_PAGE),
@@ -62,6 +87,10 @@ function ProductsContent() {
     setSort(newSort);
     setCurrentPage(1);
   };
+
+  if (loading) {
+    return <ProductGridSkeleton />;
+  }
 
   return (
     <PageTransition>

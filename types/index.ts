@@ -52,6 +52,7 @@ export interface Banner {
   image: string;
   ctaText: string;
   ctaLink: string;
+  orderIndex?: number;
 }
 
 export interface CheckoutFormData {

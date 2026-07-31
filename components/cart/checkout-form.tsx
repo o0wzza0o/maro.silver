@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import { CheckoutFormData } from "@/types";
-import { governorates } from "@/data/governorates";
+import { CheckoutFormData, Governorate } from "@/types";
+import { getGovernorates } from "@/data/governorates";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Banknote } from "lucide-react";
 
@@ -51,16 +52,53 @@ export function CheckoutForm() {
     },
   });
 
+  const [governorates, setGovernorates] = useState<Governorate[]>([]);
+  
+  useEffect(() => {
+    getGovernorates().then(setGovernorates);
+  }, []);
+
   const selectedGov = governorates.find((g) => g.id === selectedGovernorate);
   const shipping = subtotal > 100000 ? 0 : 5000;
   const total = subtotal + shipping;
 
   const onSubmit = async (data: CheckoutFormData) => {
     setIsSubmitting(true);
-    // Simulate order placement
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    clearCart();
-    router.push("/checkout/success");
+    
+    try {
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const orderNumber = `#MS-${dateStr}-${randomStr}`;
+
+      const orderData = {
+        order_number: orderNumber,
+        customer_name: data.name,
+        customer_phone: data.phone,
+        governorate: selectedGov?.name || data.governorate,
+        city: data.city,
+        address: data.address,
+        notes: data.notes || null,
+        payment_method: data.paymentMethod,
+        total_amount: total,
+        items: items.map(item => ({
+          product: { id: item.product.id, name: item.product.name },
+          quantity: item.quantity,
+          price: item.product.price,
+          selectedSize: item.selectedSize
+        }))
+      };
+
+      const { error } = await supabase.from('orders').insert([orderData]);
+
+      if (error) throw error;
+
+      clearCart();
+      router.push(`/checkout/success?order=${encodeURIComponent(orderNumber)}`);
+    } catch (error) {
+      console.error("Order submission failed:", error);
+      setIsSubmitting(false);
+      alert("حدث خطأ أثناء تقديم الطلب. يرجى المحاولة مرة أخرى.");
+    }
   };
 
   return (
