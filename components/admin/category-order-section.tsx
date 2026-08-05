@@ -30,7 +30,7 @@ interface Props {
 }
 
 const MAX_HOME = 6;
-const MAX_NAV = 8;
+const MAX_NAV = 6;
 
 const HOME_KEY = "home_category_order";
 const NAV_KEY = "nav_category_order";
@@ -134,7 +134,7 @@ function OrderContainer({
   }
 
   function add(id: string) {
-    if (selectedIds.length >= max) return;
+    if (selected.length >= max) return;
     onChange([...selectedIds, id]);
     setShowPicker(false);
   }
@@ -221,9 +221,12 @@ export function CategoryOrderSection({ allCategories, initialHomeIds, initialNav
   async function save() {
     setSaving(true);
     try {
+      const validHomeIds = homeIds.filter(id => allCategories.some(c => c.id === id));
+      const validNavIds = navIds.filter(id => allCategories.some(c => c.id === id));
+
       await Promise.all([
-        saveOrder(HOME_KEY, homeIds),
-        saveOrder(NAV_KEY, navIds),
+        saveOrder(HOME_KEY, validHomeIds),
+        saveOrder(NAV_KEY, validNavIds),
       ]);
       toast({
         title: "تم الحفظ بنجاح",
