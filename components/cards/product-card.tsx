@@ -56,7 +56,7 @@ export function ProductCard({
     return (
       <HoverLift>
         <Link
-          href={`/products/${product.slug}`}
+          href={`/products/${product.id}`}
           className={cn(
             "group flex min-w-[280px] gap-4 rounded-xl border border-border bg-background p-3 transition-all",
             className
@@ -117,7 +117,7 @@ export function ProductCard({
   return (
     <HoverLift>
       <Link
-        href={`/products/${product.slug}`}
+        href={`/products/${product.id}`}
         className={cn(
           "group relative flex flex-col rounded-xl border border-border bg-background overflow-hidden",
           className

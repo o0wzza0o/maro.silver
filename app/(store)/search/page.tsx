@@ -133,7 +133,7 @@ export default function SearchPage() {
                 {suggestedProducts.map((product) => (
                   <Link
                     key={product.id}
-                    href={`/products/${product.slug}`}
+                    href={`/products/${product.id}`}
                     className="group flex items-center gap-3 rounded-xl border border-border p-3 transition-all hover:shadow-soft"
                   >
                     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-secondary">

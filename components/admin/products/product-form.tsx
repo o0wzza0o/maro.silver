@@ -12,7 +12,6 @@ import type { Category } from "@/types";
 
 const schema = z.object({
   name: z.string().min(2, "الاسم مطلوب"),
-  slug: z.string().min(2, "الرابط مطلوب"),
   price: z.coerce.number().min(1, "السعر مطلوب"),
   original_price: z.coerce.number().optional().nullable(),
   description: z.string().optional(),
@@ -76,7 +75,6 @@ export function ProductForm({
     resolver: zodResolver(schema),
     defaultValues: {
       name: initialData?.name || "",
-      slug: initialData?.slug || "",
       price: initialData?.price || 0,
       original_price: initialData?.original_price ?? null,
       description: initialData?.description || "",
@@ -93,12 +91,6 @@ export function ProductForm({
   });
 
   const nameValue = watch("name");
-
-  function handleNameBlur() {
-    if (!isEdit) {
-      setValue("slug", slugify(nameValue));
-    }
-  }
 
   function updateImage(index: number, value: string) {
     setImages((prev) => prev.map((img, i) => (i === index ? value : img)));
@@ -136,7 +128,7 @@ export function ProductForm({
 
     const payload = {
       name: data.name,
-      slug: data.slug,
+      slug: isEdit ? initialData?.slug : crypto.randomUUID(),
       price: data.price,
       original_price: data.original_price || null,
       images: filteredImages,
@@ -187,22 +179,10 @@ export function ProductForm({
           <label className="block text-sm font-medium text-gray-700 mb-1">اسم المنتج *</label>
           <input
             {...register("name")}
-            onBlur={handleNameBlur}
             placeholder="مثال: خاتم فضة ناعم"
             className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
           {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">الرابط (Slug) *</label>
-          <input
-            {...register("slug")}
-            dir="ltr"
-            placeholder="product-slug"
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
-          />
-          {errors.slug && <p className="mt-1 text-xs text-red-600">{errors.slug.message}</p>}
         </div>
 
         <div>

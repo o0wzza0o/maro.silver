@@ -38,7 +38,7 @@ export function CartView() {
             className="flex gap-4 rounded-xl border border-border p-4"
           >
             <Link
-              href={`/products/${item.product.slug}`}
+              href={`/products/${item.product.id}`}
               className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-secondary"
             >
               <Image
@@ -53,7 +53,7 @@ export function CartView() {
             <div className="flex flex-1 flex-col justify-between min-w-0">
               <div>
                 <Link
-                  href={`/products/${item.product.slug}`}
+                  href={`/products/${item.product.id}`}
                   className="font-medium line-clamp-2 hover:underline"
                 >
                   {item.product.name}
